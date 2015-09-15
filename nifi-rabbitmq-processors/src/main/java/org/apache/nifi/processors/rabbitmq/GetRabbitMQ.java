@@ -122,6 +122,7 @@ public class GetRabbitMQ extends AbstractProcessor {
                             }
                         }
                     });
+            processSession.transfer(flowFile, SUCCESS);
         } catch (Exception e) {
             processSession.remove(flowFile);
             throw e;
