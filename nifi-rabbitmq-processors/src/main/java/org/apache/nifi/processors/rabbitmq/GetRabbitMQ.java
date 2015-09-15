@@ -21,12 +21,10 @@ import org.apache.nifi.processor.io.OutputStreamCallback;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @SupportsBatching
@@ -34,7 +32,7 @@ import java.util.concurrent.TimeoutException;
 @Tags({"RabbitMQ", "Get", "Ingest", "Topic", "PubSub", "AMQP"})
 public class GetRabbitMQ extends AbstractProcessor {
 
-    private final Queue<AMQPMessage> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<AMQPMessage> messageQueue = new LinkedBlockingQueue<>();
     private Set<Relationship> relationships;
 
     private Connection connection;
@@ -111,7 +109,12 @@ public class GetRabbitMQ extends AbstractProcessor {
         if (message == null) {
             return;
         }
+
+        final long start = System.nanoTime();
         FlowFile flowFile = processSession.create();
+        final Map<String, String> attributes = new HashMap<>();
+        attributes.put("queue", "hello");
+
         try {
             flowFile = processSession.write(flowFile,
                     new OutputStreamCallback() {
@@ -122,6 +125,10 @@ public class GetRabbitMQ extends AbstractProcessor {
                             }
                         }
                     });
+            processSession.putAllAttributes(flowFile, attributes);
+            final long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            processSession.getProvenanceReporter().receive(flowFile, "rabbitmq://hello", "Received RabbitMQ Message", millis);
+            getLogger().info("Successfully received {} from RabbitMQ in {} millis", new Object[]{flowFile, millis});
             processSession.transfer(flowFile, SUCCESS);
         } catch (Exception e) {
             processSession.remove(flowFile);
