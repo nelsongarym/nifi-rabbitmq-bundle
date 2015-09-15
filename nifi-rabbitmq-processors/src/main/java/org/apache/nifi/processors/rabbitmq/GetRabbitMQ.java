@@ -81,7 +81,7 @@ public class GetRabbitMQ extends AbstractProcessor {
                                        final AMQP.BasicProperties properties,
                                        final byte[] body) throws IOException {
 
-                getLogger().error("Got message: " + body.toString());
+                getLogger().info("Got message: " + body.toString());
                 messageQueue.add(new AMQPMessage(consumerTag, envelope, properties, body));
             }
         };
