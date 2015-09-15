@@ -127,7 +127,9 @@ public class GetRabbitMQ extends AbstractProcessor {
                     });
             processSession.putAllAttributes(flowFile, attributes);
             final long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-            processSession.getProvenanceReporter().receive(flowFile, "rabbitmq://hello", "Received RabbitMQ Message", millis);
+            // Error on 0.2.1
+            // https://issues.apache.org/jira/browse/NIFI-938
+            //processSession.getProvenanceReporter().receive(flowFile, "rabbitmq://hello", "Received RabbitMQ Message", millis);
             getLogger().info("Successfully received {} from RabbitMQ in {} millis", new Object[]{flowFile, millis});
             processSession.transfer(flowFile, SUCCESS);
         } catch (Exception e) {
