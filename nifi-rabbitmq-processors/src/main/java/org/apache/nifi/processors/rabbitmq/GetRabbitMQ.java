@@ -65,6 +65,7 @@ public class GetRabbitMQ extends AbstractProcessor {
 
         try {
             channel = connection.createChannel();
+            channel.queueDeclare("hello", true, false, false, null);
         } catch (Exception e) {
             getLogger().error("Error creating RabbitMQ channel: {}", new Object[]{e});
             return;
