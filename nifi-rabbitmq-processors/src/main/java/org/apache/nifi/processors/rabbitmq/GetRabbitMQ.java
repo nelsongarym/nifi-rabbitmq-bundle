@@ -7,8 +7,6 @@ import net.jodah.lyra.config.Config;
 import net.jodah.lyra.config.RecoveryPolicies;
 import net.jodah.lyra.config.RetryPolicy;
 import net.jodah.lyra.util.Duration;
-import org.apache.nifi.annotation.behavior.WritesAttribute;
-import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnStopped;
 import org.apache.nifi.components.Validator;
@@ -97,7 +95,7 @@ public class GetRabbitMQ extends AbstractProcessor {
             .description("Success relationship")
             .build();
 
-    private final BlockingQueue<AMQPMessage> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
     private Set<Relationship> relationships;
 
     private Connection connection;
@@ -145,24 +143,9 @@ public class GetRabbitMQ extends AbstractProcessor {
             getLogger().error("Error creating RabbitMQ channel: {}", new Object[]{e});
             return;
         }
-
-        DefaultConsumer consumer;
-
-        consumer = new DefaultConsumer(channel) {
-            @Override
-            public void handleDelivery(String consumerTag,
-                                       final Envelope envelope,
-                                       final AMQP.BasicProperties properties,
-                                       final byte[] body) throws IOException {
-
-                getLogger().info("Got message: " + body.toString());
-                messageQueue.add(new AMQPMessage(consumerTag, envelope, properties, body));
-                getLogger().info("OnScheduled messageQueue size: " + messageQueue.size());
-            }
-        };
-
+        
         try {
-            getChannel().basicConsume(rabbitQueue, true, consumer);
+            getChannel().basicConsume(rabbitQueue, true, new MessageConsumer(channel, messageQueue));
         } catch (ShutdownSignalException sse) {
             getLogger().error("Error consuming RabbitMQ channel[ShutdownSignalException]: {}", new Object[]{sse});
         } catch (Exception e) {
@@ -183,7 +166,7 @@ public class GetRabbitMQ extends AbstractProcessor {
     @Override
     public void onTrigger(ProcessContext context, final ProcessSession session) throws ProcessException {
         getLogger().info("onTrigger messageQueue size: " + messageQueue.size());
-        final AMQPMessage message = messageQueue.poll();
+        final Message message = messageQueue.poll();
         if (message == null) {
             return;
         }
@@ -261,37 +244,6 @@ public class GetRabbitMQ extends AbstractProcessor {
     @Override
     public Set<Relationship> getRelationships(){
         return relationships;
-    }
-
-    private static class AMQPMessage {
-        private final String consumerTag;
-        private final Envelope envelope;
-        private final AMQP.BasicProperties properties;
-        private final byte[] body;
-
-        public AMQPMessage(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-            this.consumerTag = consumerTag;
-            this.envelope = envelope;
-            this.properties = properties;
-            this.body = body;
-        }
-
-        public String getConsumerTag() {
-            return consumerTag;
-        }
-
-        public Envelope getEnvelope() {
-            return envelope;
-        }
-
-        public AMQP.BasicProperties getProperties() {
-            return properties;
-        }
-
-        public byte[] getBody() {
-            return body;
-        }
-
     }
 
     private Channel getChannel() {
