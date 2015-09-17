@@ -5,7 +5,7 @@ import org.apache.nifi.components.Validator;
 import org.apache.nifi.processor.util.StandardValidators;
 
 public class Properties {
-    public static PropertyDescriptor RABBITMQ_HOST = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor RABBITMQ_HOST = new PropertyDescriptor.Builder()
             .name("RabbitMQ Host")
             .description("RabbitMQ host")
             .required(true)
@@ -14,7 +14,7 @@ public class Properties {
             .expressionLanguageSupported(false)
             .build();
 
-    public static PropertyDescriptor RABBITMQ_PORT = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor RABBITMQ_PORT = new PropertyDescriptor.Builder()
             .name("RabbitMQ port")
             .description("RabbitMQ port")
             .required(true)
@@ -24,7 +24,7 @@ public class Properties {
             .expressionLanguageSupported(false)
             .build();
 
-    public static PropertyDescriptor RABBITMQ_USERNAME = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor RABBITMQ_USERNAME = new PropertyDescriptor.Builder()
             .name("RabbitMQ username")
             .description("RabbitMQ username")
             .required(true)
@@ -33,7 +33,7 @@ public class Properties {
             .expressionLanguageSupported(false)
             .build();
 
-    public static PropertyDescriptor RABBITMQ_PASSWORD = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor RABBITMQ_PASSWORD = new PropertyDescriptor.Builder()
             .name("RabbitMQ password")
             .description("RabbitMQ password")
             .required(true)
@@ -42,7 +42,7 @@ public class Properties {
             .expressionLanguageSupported(false)
             .build();
 
-    public static PropertyDescriptor RABBITMQ_VIRTUALHOST = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor RABBITMQ_VIRTUALHOST = new PropertyDescriptor.Builder()
             .name("RabbitMQ virtual host")
             .description("RabbitMQ virtual host")
             .required(true)
@@ -51,7 +51,7 @@ public class Properties {
             .expressionLanguageSupported(false)
             .build();
 
-    public static PropertyDescriptor RABBITMQ_QUEUE = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor RABBITMQ_QUEUE = new PropertyDescriptor.Builder()
             .name("RabbitMQ queue")
             .description("RabbitMQ queue")
             .required(false)

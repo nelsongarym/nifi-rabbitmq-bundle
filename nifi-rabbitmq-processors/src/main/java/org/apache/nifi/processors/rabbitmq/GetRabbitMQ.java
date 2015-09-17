@@ -103,7 +103,6 @@ public class GetRabbitMQ extends AbstractProcessor {
         } catch (Exception e) {
             getLogger().error("Error consuming RabbitMQ channel: {}", new Object[]{e});
             e.printStackTrace();
-            return;
         }
 
     }
