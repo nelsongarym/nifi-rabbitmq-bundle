@@ -1,4 +1,4 @@
-package org.apache.nifi.processors.rabbitmq;
+package org.apache.nifi.processors.rabbitmq.util;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;

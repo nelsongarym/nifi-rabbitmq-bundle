@@ -9,17 +9,24 @@ import net.jodah.lyra.config.RetryPolicy;
 import net.jodah.lyra.util.Duration;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnStopped;
-import org.apache.nifi.components.Validator;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.*;
 import org.apache.nifi.processor.exception.ProcessException;
+
+import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_HOST;
+import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_PORT;
+import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_USERNAME;
+import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_PASSWORD;
+import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_VIRTUALHOST;
+import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_QUEUE;
 
 import org.apache.nifi.annotation.behavior.SupportsBatching;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.processor.io.OutputStreamCallback;
-import org.apache.nifi.processor.util.StandardValidators;
+import org.apache.nifi.processors.rabbitmq.util.Message;
+import org.apache.nifi.processors.rabbitmq.util.MessageConsumer;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -34,61 +41,6 @@ import java.util.concurrent.TimeoutException;
 @CapabilityDescription("Fetches messages from RabbitMQ")
 @Tags({"RabbitMQ", "Get", "Ingest", "Topic", "PubSub", "AMQP"})
 public class GetRabbitMQ extends AbstractProcessor {
-
-    public static PropertyDescriptor RABBITMQ_HOST = new PropertyDescriptor.Builder()
-            .name("RabbitMQ Host")
-            .description("RabbitMQ host")
-            .required(true)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .defaultValue("localhost")
-            .expressionLanguageSupported(false)
-            .build();
-
-    public static PropertyDescriptor RABBITMQ_PORT = new PropertyDescriptor.Builder()
-            .name("RabbitMQ port")
-            .description("RabbitMQ port")
-            .required(true)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .addValidator(StandardValidators.PORT_VALIDATOR)
-            .defaultValue("5672")
-            .expressionLanguageSupported(false)
-            .build();
-
-    public static PropertyDescriptor RABBITMQ_USERNAME = new PropertyDescriptor.Builder()
-            .name("RabbitMQ username")
-            .description("RabbitMQ username")
-            .required(true)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .defaultValue("guest")
-            .expressionLanguageSupported(false)
-            .build();
-
-    public static PropertyDescriptor RABBITMQ_PASSWORD = new PropertyDescriptor.Builder()
-            .name("RabbitMQ password")
-            .description("RabbitMQ password")
-            .required(true)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .defaultValue("guest")
-            .expressionLanguageSupported(false)
-            .build();
-
-    public static PropertyDescriptor RABBITMQ_VIRTUALHOST = new PropertyDescriptor.Builder()
-            .name("RabbitMQ virtual host")
-            .description("RabbitMQ virtual host")
-            .required(true)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .defaultValue("/")
-            .expressionLanguageSupported(false)
-            .build();
-
-    public static PropertyDescriptor RABBITMQ_QUEUE = new PropertyDescriptor.Builder()
-            .name("RabbitMQ queue")
-            .description("RabbitMQ queue")
-            .required(false)
-            .addValidator(Validator.VALID)
-            .defaultValue("")
-            .expressionLanguageSupported(false)
-            .build();
 
     public static final Relationship SUCCESS = new Relationship.Builder()
             .name("SUCCESS")
@@ -143,7 +95,7 @@ public class GetRabbitMQ extends AbstractProcessor {
             getLogger().error("Error creating RabbitMQ channel: {}", new Object[]{e});
             return;
         }
-        
+
         try {
             getChannel().basicConsume(rabbitQueue, true, new MessageConsumer(channel, messageQueue));
         } catch (ShutdownSignalException sse) {
