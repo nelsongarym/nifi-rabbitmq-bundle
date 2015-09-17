@@ -13,12 +13,12 @@ import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.*;
 import org.apache.nifi.processor.exception.ProcessException;
 
-import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_HOST;
-import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_PORT;
-import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_USERNAME;
-import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_PASSWORD;
-import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_VIRTUALHOST;
-import static org.apache.nifi.processors.rabbitmq.util.Properties.RABBITMQ_QUEUE;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_HOST;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_PORT;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_USERNAME;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_PASSWORD;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_VIRTUALHOST;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_QUEUE;
 
 import org.apache.nifi.annotation.behavior.SupportsBatching;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;

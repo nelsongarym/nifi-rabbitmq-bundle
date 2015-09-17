@@ -2,7 +2,7 @@ package org.apache.nifi.processors.rabbitmq;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.nifi.processors.rabbitmq.util.Properties;
+import org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties;
 import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
@@ -31,12 +31,12 @@ public class TestGetRabbitMQ {
     public void testIntegrationLocally() throws Exception {
         final TestRunner runner = TestRunners.newTestRunner(GetRabbitMQ.class);
 
-        runner.setProperty(Properties.RABBITMQ_HOST, "localhost");
-        runner.setProperty(Properties.RABBITMQ_PORT, "5672");
-        runner.setProperty(Properties.RABBITMQ_USERNAME, "guest");
-        runner.setProperty(Properties.RABBITMQ_PASSWORD, "guest");
-        runner.setProperty(Properties.RABBITMQ_VIRTUALHOST, "/");
-        runner.setProperty(Properties.RABBITMQ_QUEUE, "hello");
+        runner.setProperty(RabbitMQProperties.RABBITMQ_HOST, "localhost");
+        runner.setProperty(RabbitMQProperties.RABBITMQ_PORT, "5672");
+        runner.setProperty(RabbitMQProperties.RABBITMQ_USERNAME, "guest");
+        runner.setProperty(RabbitMQProperties.RABBITMQ_PASSWORD, "guest");
+        runner.setProperty(RabbitMQProperties.RABBITMQ_VIRTUALHOST, "/");
+        runner.setProperty(RabbitMQProperties.RABBITMQ_QUEUE, "hello");
 
         LOGGER.info("Starting test");
         LOGGER.info("count: " + runner.getQueueSize().getObjectCount());

@@ -4,7 +4,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.Validator;
 import org.apache.nifi.processor.util.StandardValidators;
 
-public class Properties {
+public class RabbitMQProperties {
     public static final PropertyDescriptor RABBITMQ_HOST = new PropertyDescriptor.Builder()
             .name("RabbitMQ Host")
             .description("RabbitMQ host")
