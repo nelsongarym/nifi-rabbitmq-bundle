@@ -35,15 +35,6 @@ import java.util.concurrent.TimeoutException;
 @SupportsBatching
 @CapabilityDescription("Fetches messages from RabbitMQ")
 @Tags({"RabbitMQ", "Get", "Ingest", "Topic", "PubSub", "AMQP"})
-@WritesAttributes({
-        @WritesAttribute(attribute = "rabbitmq.host", description = "RabbitMQ host"),
-        @WritesAttribute(attribute = "rabbitmq.port", description = "RabbitMQ port"),
-        @WritesAttribute(attribute = "rabbitmq.username", description = "RabbitMQ username"),
-        @WritesAttribute(attribute = "rabbitmq.password", description = "RabbitMQ password"),
-        @WritesAttribute(attribute = "rabbitmq.virtualhost", description = "RabbitMQ virtual host"),
-        @WritesAttribute(attribute = "rabbitmq.exchange", description = "RabbitMQ exchange"),
-        @WritesAttribute(attribute = "rabbitmq.queue", description = "RabbitMQ queue")
-})
 public class GetRabbitMQ extends AbstractProcessor {
 
     public static PropertyDescriptor RABBITMQ_HOST = new PropertyDescriptor.Builder()
@@ -166,6 +157,7 @@ public class GetRabbitMQ extends AbstractProcessor {
 
                 getLogger().info("Got message: " + body.toString());
                 messageQueue.add(new AMQPMessage(consumerTag, envelope, properties, body));
+                getLogger().info("OnScheduled messageQueue size: " + messageQueue.size());
             }
         };
 
@@ -189,20 +181,18 @@ public class GetRabbitMQ extends AbstractProcessor {
     }
 
     @Override
-    public void onTrigger(ProcessContext processContext, final ProcessSession processSession) throws ProcessException {
+    public void onTrigger(ProcessContext context, final ProcessSession session) throws ProcessException {
+        getLogger().info("onTrigger messageQueue size: " + messageQueue.size());
         final AMQPMessage message = messageQueue.poll();
         if (message == null) {
             return;
         }
 
-        final String rabbitQueue = processContext.getProperty(RABBITMQ_QUEUE).getValue();
+        final String rabbitQueue = context.getProperty(RABBITMQ_QUEUE).getValue();
         final long start = System.nanoTime();
-        FlowFile flowFile = processSession.create();
-        final Map<String, String> attributes = new HashMap<>();
-        attributes.put("rabbitmq.queue", rabbitQueue);
-
+        FlowFile flowFile = session.create();
         try {
-            flowFile = processSession.write(flowFile,
+            flowFile = session.write(flowFile,
                     new OutputStreamCallback() {
                         @Override
                         public void process(OutputStream outputStream) throws IOException {
@@ -213,16 +203,15 @@ public class GetRabbitMQ extends AbstractProcessor {
                     });
 
             if (flowFile.getSize() == 0L) {
-                processSession.remove(flowFile);
+                session.remove(flowFile);
             } else {
-                processSession.putAllAttributes(flowFile, attributes);
                 final long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-                processSession.getProvenanceReporter().receive(flowFile, "rabbitmq://" + rabbitQueue, "Received RabbitMQ Message", millis);
-                getLogger().info("Successfully received {} from RabbitMQ in {} millis", new Object[]{flowFile, millis});
-                processSession.transfer(flowFile, SUCCESS);
+                session.getProvenanceReporter().receive(flowFile, "rabbitmq://" + rabbitQueue, "Received RabbitMQ Message", millis);
+                getLogger().info("Successfully received {} ({}) from RabbitMQ in {} millis", new Object[]{flowFile, flowFile.getSize(), millis});
+                session.transfer(flowFile, SUCCESS);
             }
         } catch (Exception e) {
-            processSession.remove(flowFile);
+            session.remove(flowFile);
             throw e;
         }
     }

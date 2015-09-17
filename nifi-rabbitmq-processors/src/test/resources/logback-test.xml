@@ -13,24 +13,25 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.apache.nifi</groupId>
-        <artifactId>nifi-nar-bundles</artifactId>
-        <version>0.3.0-SNAPSHOT</version>
-    </parent>
+<configuration scan="true" scanPeriod="30 seconds">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%-4r [%t] %-5p %c - %m%n</pattern>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+    </appender>
 
-    <groupId>org.apache.nifi</groupId>
-    <artifactId>nifi-rabbitmq-bundle</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <!-- valid logging levels: TRACE, DEBUG, INFO, WARN, ERROR -->
+    <logger name="org.apache.nifi" level="INFO"/>
 
-    <modules>
-        <module>nifi-rabbitmq-processors</module>
-        <module>nifi-rabbitmq-nar</module>
-    </modules>
-</project>
+    <!-- Logger for managing logging statements for nifi clusters. -->
+    <logger name="org.apache.nifi.cluster" level="INFO"/>
+
+    <logger name="org.apache.nifi.processors.rabbitmq" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
