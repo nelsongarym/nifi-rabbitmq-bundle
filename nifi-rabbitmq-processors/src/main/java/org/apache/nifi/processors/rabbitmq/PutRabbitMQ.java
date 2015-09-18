@@ -57,10 +57,8 @@ public class PutRabbitMQ extends AbstractProcessor {
     public void createProducers(final ProcessContext context) {
         final String rabbitQueue = context.getProperty(RABBITMQ_QUEUE).getValue();
 
-        Config config = new Config();
-
         try {
-            connection = RabbitMQFactory.createConnection(config, context);
+            connection = RabbitMQFactory.createConnection(context);
         } catch (Exception e) {
             getLogger().error("Error creating RabbitMQ connection: {}", new Object[]{e});
             return;

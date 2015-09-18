@@ -16,8 +16,9 @@ import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.*;
 
 public class RabbitMQFactory {
 
-    public static Connection createConnection(Config config, final ProcessContext context) throws IOException, TimeoutException {
+    public static Connection createConnection(final ProcessContext context) throws IOException, TimeoutException {
 
+        Config config = new Config();
         final String rabbitHost = context.getProperty(RABBITMQ_HOST).getValue();
         final int rabbitPort = context.getProperty(RABBITMQ_PORT).asInteger();
         final String rabbitVirtualHost = context.getProperty(RABBITMQ_VIRTUALHOST).getValue();
