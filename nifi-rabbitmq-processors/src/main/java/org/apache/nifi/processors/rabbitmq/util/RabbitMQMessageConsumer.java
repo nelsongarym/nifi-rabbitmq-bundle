@@ -11,21 +11,21 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Queue;
 
-public class MessageConsumer extends DefaultConsumer {
+public class RabbitMQMessageConsumer extends DefaultConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RabbitMQMessageConsumer.class);
 
-    private final Queue<Message> queue;
+    private final Queue<RabbitMQMessage> queue;
 
-    public MessageConsumer(Channel channel, Queue<Message> queue) {
-        super(channel);;
+    public RabbitMQMessageConsumer(Channel channel, Queue<RabbitMQMessage> queue) {
+        super(channel);
         this.queue = queue;
     }
 
     @Override
     public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
         logger.info("Got message: " + Arrays.toString(body));
-        queue.add(new Message(consumerTag, envelope, properties, body));
+        queue.add(new RabbitMQMessage(consumerTag, envelope, properties, body));
         logger.info("OnScheduled messageQueue size: " + queue.size());
     }
 }
