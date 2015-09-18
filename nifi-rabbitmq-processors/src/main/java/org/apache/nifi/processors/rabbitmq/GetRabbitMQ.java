@@ -2,6 +2,7 @@ package org.apache.nifi.processors.rabbitmq;
 
 import com.rabbitmq.client.*;
 import net.jodah.lyra.config.Config;
+import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnStopped;
 import org.apache.nifi.flowfile.FlowFile;
@@ -15,7 +16,6 @@ import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBIT
 import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_VIRTUALHOST;
 import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_QUEUE;
 
-import org.apache.nifi.annotation.behavior.SupportsBatching;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
@@ -31,9 +31,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-@SupportsBatching
 @CapabilityDescription("Fetches messages from RabbitMQ")
 @Tags({"RabbitMQ", "Get", "Ingest", "Topic", "PubSub", "AMQP"})
+@SeeAlso(PutRabbitMQ.class)
 public class GetRabbitMQ extends AbstractProcessor {
 
     public static final Relationship SUCCESS = new Relationship.Builder()
@@ -42,17 +42,9 @@ public class GetRabbitMQ extends AbstractProcessor {
             .build();
 
     private final BlockingQueue<RabbitMQMessage> rabbitMQMessageQueue = new LinkedBlockingQueue<>();
-    private Set<Relationship> relationships;
 
     private Connection connection;
     private Channel channel;
-
-    @Override
-    public void init(final ProcessorInitializationContext context){
-        Set<Relationship> relationships = new HashSet<>();
-        relationships.add(SUCCESS);
-        this.relationships = Collections.unmodifiableSet(relationships);
-    }
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
@@ -65,6 +57,13 @@ public class GetRabbitMQ extends AbstractProcessor {
         props.add(RABBITMQ_QUEUE);
 
         return props;
+    }
+
+    @Override
+    public Set<Relationship> getRelationships() {
+        final Set<Relationship> relationships = new HashSet<>(1);
+        relationships.add(SUCCESS);
+        return relationships;
     }
 
     @OnScheduled
@@ -143,10 +142,5 @@ public class GetRabbitMQ extends AbstractProcessor {
             session.remove(flowFile);
             throw e;
         }
-    }
-
-    @Override
-    public Set<Relationship> getRelationships(){
-        return relationships;
     }
 }
