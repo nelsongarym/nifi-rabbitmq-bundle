@@ -2,7 +2,6 @@ package org.apache.nifi.processors.rabbitmq;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import net.jodah.lyra.config.Config;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -21,12 +20,15 @@ import org.apache.nifi.stream.io.StreamUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_QUEUE;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.*;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_PASSWORD;
+import static org.apache.nifi.processors.rabbitmq.util.RabbitMQProperties.RABBITMQ_VIRTUALHOST;
 
 @CapabilityDescription("Fetches messages from RabbitMQ")
 @Tags({"RabbitMQ", "Put", "Ingest", "Topic", "PubSub", "AMQP"})
@@ -43,7 +45,15 @@ public class PutRabbitMQ extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return super.getSupportedPropertyDescriptors();
+        final List<PropertyDescriptor> props = new ArrayList<>();
+        props.add(RABBITMQ_HOST);
+        props.add(RABBITMQ_PORT);
+        props.add(RABBITMQ_USERNAME);
+        props.add(RABBITMQ_PASSWORD);
+        props.add(RABBITMQ_VIRTUALHOST);
+        props.add(RABBITMQ_QUEUE);
+
+        return props;
     }
 
     @Override

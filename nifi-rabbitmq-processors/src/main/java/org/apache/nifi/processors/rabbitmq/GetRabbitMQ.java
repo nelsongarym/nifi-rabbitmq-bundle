@@ -1,7 +1,6 @@
 package org.apache.nifi.processors.rabbitmq;
 
 import com.rabbitmq.client.*;
-import net.jodah.lyra.config.Config;
 import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnStopped;
