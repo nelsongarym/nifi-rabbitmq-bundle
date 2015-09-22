@@ -20,7 +20,7 @@ Copy `nifi-rabbitmq-nar/target/nifi-rabbitmq-nar-0.3.0-SNAPSHOT.nar` to `$NIFI_H
 
 Apache 2.0
 
-### Example: Send messages to nifi-rabbitmq-bundle using Ruby
+#### Example: Sending messages to nifi-rabbitmq-bundle using Ruby
 
 ```ruby
 require "bunny"
