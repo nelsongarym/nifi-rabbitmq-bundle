@@ -1,6 +1,6 @@
 # nifi-rabbitmq-bundle
 
-In development.  Not ready for production use.
+This project is in active development.  It is not ready for production use.
 
 This processor only supports direct exchanges.  Once the code is tested, support for other exchange types will be added.
 
