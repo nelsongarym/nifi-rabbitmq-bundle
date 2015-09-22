@@ -23,18 +23,20 @@ Apache 2.0
 #### Example: Sending messages to nifi-rabbitmq-bundle using Ruby
 
 ```ruby
-require "bunny"
+require 'bunny'
 require 'faker'
 
 conn = Bunny.new
 conn.start
 
-ch   = conn.create_channel
-
+ch = conn.create_channel
 q = ch.queue("hello", :durable => true)
-1.upto(1) do
+
+1.upto(100) do
   msg = Faker::Lorem.paragraphs.join
   ch.default_exchange.publish(msg, :routing_key => q.name)
   puts " [x] Sent #{msg}"
 end
+
+conn.close
 ```
